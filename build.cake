@@ -14,8 +14,8 @@ var configuration = Argument("configuration", "Release");
 // GLOBAL VARIABLES
 ///////////////////////////////////////////////////////////////////////////////
 var artifactsDir = "./artifacts";
-var globalAssemblyFile = "./source/Octopus.Web.XmlTransform/Properties/AssemblyInfo.cs";
-var projectToPackage = "./source/Octopus.Web.XmlTransform";
+var globalAssemblyFile = "./Octopus.Web.XmlTransform/Properties/AssemblyInfo.cs";
+var projectToPackage = "./Octopus.Web.XmlTransform";
 
 var isContinuousIntegrationBuild = !BuildSystem.IsLocalBuild;
 
@@ -56,8 +56,8 @@ Task("__Clean")
     .Does(() =>
 {
     CleanDirectory(artifactsDir);
-    CleanDirectories("./source/**/bin");
-    CleanDirectories("./source/**/obj");
+    CleanDirectories("./**/bin");
+    CleanDirectories("./**/obj");
 });
 
 Task("__Restore")
