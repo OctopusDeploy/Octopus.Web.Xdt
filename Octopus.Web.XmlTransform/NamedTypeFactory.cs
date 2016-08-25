@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using System.Reflection;
 using System.IO;
+using System.Runtime.Loader;
 
 namespace Octopus.Web.XmlTransform
 {
@@ -18,7 +20,7 @@ namespace Octopus.Web.XmlTransform
         }
 
         private void CreateDefaultRegistrations() {
-            AddAssemblyRegistration(GetType().Assembly, GetType().Namespace);
+            AddAssemblyRegistration(GetType().GetTypeInfo().Assembly, GetType().Namespace);
         }
 
         internal void AddAssemblyRegistration(Assembly assembly, string nameSpace) {
@@ -42,15 +44,15 @@ namespace Octopus.Web.XmlTransform
             if (!String.IsNullOrEmpty(typeName)) {
                 Type type = GetType(typeName);
                 if (type == null) {
-                    throw new XmlTransformationException(string.Format(System.Globalization.CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_UnknownTypeName, typeName, typeof(ObjectType).Name));
+                    throw new XmlTransformationException(string.Format(CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_UnknownTypeName, typeName, typeof(ObjectType).Name));
                 }
-                else if (!type.IsSubclassOf(typeof(ObjectType))) {
-                    throw new XmlTransformationException(string.Format(System.Globalization.CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_IncorrectBaseType, type.FullName, typeof(ObjectType).Name));
+                else if (!type.GetTypeInfo().IsSubclassOf(typeof(ObjectType))) {
+                    throw new XmlTransformationException(string.Format(CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_IncorrectBaseType, type.FullName, typeof(ObjectType).Name));
                 }
                 else {
                     ConstructorInfo constructor = type.GetConstructor(Type.EmptyTypes);
                     if (constructor == null) {
-                        throw new XmlTransformationException(string.Format(System.Globalization.CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_NoValidConstructor, type.FullName));
+                        throw new XmlTransformationException(string.Format(CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_NoValidConstructor, type.FullName));
                     }
                     else {
                         return constructor.Invoke(new object[] { }) as ObjectType;
@@ -71,7 +73,7 @@ namespace Octopus.Web.XmlTransform
                             foundType = regType;
                         }
                         else {
-                            throw new XmlTransformationException(string.Format(System.Globalization.CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_AmbiguousTypeMatch, typeName));
+                            throw new XmlTransformationException(string.Format(CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_AmbiguousTypeMatch, typeName));
                         }
                     }
                 }
@@ -111,14 +113,14 @@ namespace Octopus.Web.XmlTransform
         private class AssemblyNameRegistration : Registration
         {
             public AssemblyNameRegistration(string assemblyName, string nameSpace)
-                : base(Assembly.Load(assemblyName), nameSpace) {
+                 : base(Assembly.Load(new AssemblyName(assemblyName)), nameSpace) {
             }
         }
 
         private class PathRegistration : Registration
         {
             public PathRegistration(string path, string nameSpace)
-                : base(Assembly.LoadFile(path), nameSpace) {
+                : base(AssemblyLoadContext.Default.LoadFromAssemblyPath(path), nameSpace) {
             }
         }
     }

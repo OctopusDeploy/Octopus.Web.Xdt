@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace Octopus.Web.XmlTransform
 {
@@ -161,7 +162,7 @@ namespace Octopus.Web.XmlTransform
         private string TransformNameLong {
             get {
                 if (context.HasLineInfo) {
-                    return string.Format(System.Globalization.CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_TransformNameFormatLong, TransformName, context.TransformLineNumber, context.TransformLinePosition);
+                    return string.Format(CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_TransformNameFormatLong, TransformName, context.TransformLineNumber, context.TransformLinePosition);
                 }
                 else {
                     return TransformNameShort;
@@ -171,7 +172,7 @@ namespace Octopus.Web.XmlTransform
 
         internal string TransformNameShort {
             get {
-                return string.Format(System.Globalization.CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_TransformNameFormatShort, TransformName);
+                return string.Format(CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_TransformNameFormatShort, TransformName);
             }
         }
 
@@ -253,7 +254,7 @@ namespace Octopus.Web.XmlTransform
             foreach (XmlNode node in TargetNodes) {
                 try {
                     currentTargetNode = node;
-                    currentTransformNode = originalTransformNode.Clone();
+                    currentTransformNode = originalTransformNode.CloneNode(true);
 
                     ApplyOnce();
                 }
@@ -312,7 +313,7 @@ namespace Octopus.Web.XmlTransform
                 ? SR.XMLTRANSFORMATION_TransformSourceMatchWasRemoved
                 : SR.XMLTRANSFORMATION_TransformNoMatchingTargetNodes;
 
-            string message = string.Format(System.Globalization.CultureInfo.CurrentCulture,messageFormat, matchFailureContext.XPath);
+            string message = string.Format(CultureInfo.CurrentCulture,messageFormat, matchFailureContext.XPath);
             switch(MissingTargetMessage) {
                 case MissingTargetMessage.None:
                     Log.LogMessage(MessageType.Verbose, message);

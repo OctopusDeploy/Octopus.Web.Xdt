@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace Octopus.Web.XmlTransform
 {
@@ -119,7 +120,7 @@ namespace Octopus.Web.XmlTransform
 
         protected void EnsureArguments(int min) {
             if (Arguments == null || Arguments.Count < min) {
-                throw new XmlTransformationException(string.Format(System.Globalization.CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_RequiresMinimumArguments, GetType().Name, min));
+                throw new XmlTransformationException(string.Format(CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_RequiresMinimumArguments, GetType().Name, min));
             }
         }
 
@@ -127,14 +128,14 @@ namespace Octopus.Web.XmlTransform
             Debug.Assert(min <= max);
             if (min == max) {
                 if (Arguments == null || Arguments.Count != min) {
-                    throw new XmlTransformationException(string.Format(System.Globalization.CultureInfo.CurrentCulture, SR.XMLTRANSFORMATION_RequiresExactArguments, GetType().Name, min));
+                    throw new XmlTransformationException(string.Format(CultureInfo.CurrentCulture, SR.XMLTRANSFORMATION_RequiresExactArguments, GetType().Name, min));
                 }
             }
 
             EnsureArguments(min);
 
             if (Arguments.Count > max) {
-                throw new XmlTransformationException(string.Format(System.Globalization.CultureInfo.CurrentCulture, SR.XMLTRANSFORMATION_TooManyArguments, GetType().Name));
+                throw new XmlTransformationException(string.Format(CultureInfo.CurrentCulture, SR.XMLTRANSFORMATION_TooManyArguments, GetType().Name));
             }
         }
 

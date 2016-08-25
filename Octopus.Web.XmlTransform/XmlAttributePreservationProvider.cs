@@ -54,7 +54,7 @@ namespace Octopus.Web.XmlTransform
         {
             if (streamReader != null)
             {
-                streamReader.Close();
+                streamReader.Dispose();
                 streamReader = null;
             }
             if (reader != null)

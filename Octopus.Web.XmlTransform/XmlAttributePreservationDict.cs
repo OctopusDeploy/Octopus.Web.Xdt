@@ -65,15 +65,14 @@ namespace Octopus.Web.XmlTransform
                 xmlDocString = elementStartTag.Substring(0, elementStartTag.Length-1) + "/>" ;
             }
 
-            XmlTextReader xmlReader = new XmlTextReader(new StringReader(xmlDocString));
-
-            xmlReader.Namespaces = false;
+            XmlReader xmlReader = XmlReader.Create(new StringReader(xmlDocString));
             xmlReader.Read();
 
             bool hasMoreAttributes = xmlReader.MoveToFirstAttribute();
+            IXmlLineInfo xmlLineInfo = (IXmlLineInfo) xmlReader;
             while (hasMoreAttributes)
             {
-                onAttributeSpotted(xmlReader.LineNumber, xmlReader.LinePosition, xmlReader.Name);
+                onAttributeSpotted(xmlLineInfo.LineNumber, xmlLineInfo.LinePosition, xmlReader.Name);
                 hasMoreAttributes = xmlReader.MoveToNextAttribute();
             }
 

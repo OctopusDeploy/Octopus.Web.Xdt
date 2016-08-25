@@ -1,6 +1,6 @@
 using System;
-using System.ComponentModel.Design;
 using System.Diagnostics;
+using System.Globalization;
 using System.Xml;
 using System.IO;
 
@@ -43,7 +43,7 @@ namespace Octopus.Web.XmlTransform
             xmlTransformation = new XmlFileInfoDocument();
             if (isTransformAFile)
             {
-                xmlTransformation.Load(transform);
+                ((XmlFileInfoDocument)xmlTransformation).Load(transform);
             }
             else
             {
@@ -151,12 +151,12 @@ namespace Octopus.Web.XmlTransform
             }
         }
 
-        public void AddTransformationService(System.Type serviceType, object serviceInstance)
+        public void AddTransformationService(Type serviceType, object serviceInstance)
         {
             transformationServiceContainer.AddService(serviceType, serviceInstance);
         }
 
-        public void RemoveTransformationService(System.Type serviceType)
+        public void RemoveTransformationService(Type serviceType)
         {
             transformationServiceContainer.RemoveService(serviceType);
         }
@@ -244,7 +244,7 @@ namespace Octopus.Web.XmlTransform
                 XmlAttribute SupressWarningsAttribute = context.Element.Attributes.GetNamedItem(XmlTransformation.SupressWarnings, XmlTransformation.TransformNamespace) as XmlAttribute;
                 if (SupressWarningsAttribute != null)
                 {
-                    bool fSupressWarning = System.Convert.ToBoolean(SupressWarningsAttribute.Value, System.Globalization.CultureInfo.InvariantCulture);
+                    bool fSupressWarning = Convert.ToBoolean(SupressWarningsAttribute.Value, CultureInfo.InvariantCulture);
                     logger.SupressWarnings = fSupressWarning;
                 }
 
@@ -303,17 +303,17 @@ namespace Octopus.Web.XmlTransform
                     }
                 }
 
-                throw new XmlNodeException(string.Format(System.Globalization.CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_ImportUnknownAttribute, attribute.Name), attribute);
+                throw new XmlNodeException(string.Format(CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_ImportUnknownAttribute, attribute.Name), attribute);
             }
 
             if (assemblyName != null && path != null) {
-                throw new XmlNodeException(string.Format(System.Globalization.CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_ImportAttributeConflict), context.Element);
+                throw new XmlNodeException(string.Format(CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_ImportAttributeConflict), context.Element);
             }
             else if (assemblyName == null && path == null) {
-                throw new XmlNodeException(string.Format(System.Globalization.CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_ImportMissingAssembly), context.Element);
+                throw new XmlNodeException(string.Format(CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_ImportMissingAssembly), context.Element);
             }
             else if (nameSpace == null) {
-                throw new XmlNodeException(string.Format(System.Globalization.CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_ImportMissingNamespace), context.Element);
+                throw new XmlNodeException(string.Format(CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_ImportMissingNamespace), context.Element);
             }
             else {
                 if (assemblyName != null) {

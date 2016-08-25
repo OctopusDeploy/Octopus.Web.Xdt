@@ -1,13 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
-using System.Security.Permissions;
 using System.Text;
 using System.Xml;
 
 namespace Octopus.Web.XmlTransform
 {
-    [Serializable]
     public sealed class XmlNodeException : XmlTransformationException
     {
         private XmlFileInfoDocument document;
@@ -58,15 +55,6 @@ namespace Octopus.Web.XmlTransform
             get {
                 return lineInfo != null ? lineInfo.LinePosition : 0;
             }
-        }
-
-        [SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("document", document);
-            info.AddValue("lineInfo", lineInfo);
         }
     }
 }

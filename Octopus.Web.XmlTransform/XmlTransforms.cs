@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using System.Diagnostics;
+using System.Globalization;
 using RegularExpressions = System.Text.RegularExpressions;
 
 namespace Octopus.Web.XmlTransform
@@ -111,21 +112,21 @@ namespace Octopus.Web.XmlTransform
             get {
                 if (siblingElement == null) {
                     if (Arguments == null || Arguments.Count == 0) {
-                        throw new XmlTransformationException(string.Format(System.Globalization.CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_InsertMissingArgument, GetType().Name));
+                        throw new XmlTransformationException(string.Format(CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_InsertMissingArgument, GetType().Name));
                     }
                     else if (Arguments.Count > 1) {
-                        throw new XmlTransformationException(string.Format(System.Globalization.CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_InsertTooManyArguments, GetType().Name));
+                        throw new XmlTransformationException(string.Format(CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_InsertTooManyArguments, GetType().Name));
                     }
                     else {
                         string xpath = Arguments[0];
                         XmlNodeList siblings = TargetNode.SelectNodes(xpath);
                         if (siblings.Count == 0) {
-                            throw new XmlTransformationException(string.Format(System.Globalization.CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_InsertBadXPath, xpath));
+                            throw new XmlTransformationException(string.Format(CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_InsertBadXPath, xpath));
                         }
                         else {
                             siblingElement = siblings[0] as XmlElement;
                             if (siblingElement == null) {
-                                throw new XmlTransformationException(string.Format(System.Globalization.CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_InsertBadXPathResult, xpath));
+                                throw new XmlTransformationException(string.Format(CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_InsertBadXPathResult, xpath));
                             }
                         }
                     }
@@ -141,7 +142,7 @@ namespace Octopus.Web.XmlTransform
         protected override void Apply() {
             SiblingElement.ParentNode.InsertAfter(TransformNode, SiblingElement);
 
-            Log.LogMessage(MessageType.Verbose, string.Format(System.Globalization.CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_TransformMessageInsert, TransformNode.Name));
+            Log.LogMessage(MessageType.Verbose, string.Format(CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_TransformMessageInsert, TransformNode.Name));
         }
     }
 
@@ -150,7 +151,7 @@ namespace Octopus.Web.XmlTransform
         protected override void Apply() {
             SiblingElement.ParentNode.InsertBefore(TransformNode, SiblingElement);
 
-            Log.LogMessage(MessageType.Verbose, string.Format(System.Globalization.CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_TransformMessageInsert, TransformNode.Name));
+            Log.LogMessage(MessageType.Verbose, string.Format(CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_TransformMessageInsert, TransformNode.Name));
         }
     }
 
@@ -163,7 +164,7 @@ namespace Octopus.Web.XmlTransform
                     targetAttribute.Value = transformAttribute.Value;
                 }
                 else {
-                    TargetNode.Attributes.Append((XmlAttribute)transformAttribute.Clone());
+                    TargetNode.Attributes.Append((XmlAttribute)transformAttribute.CloneNode(true));
                 }
 
                 Log.LogMessage(MessageType.Verbose, SR.XMLTRANSFORMATION_TransformMessageSetAttribute, transformAttribute.Name);
@@ -255,7 +256,7 @@ namespace Octopus.Web.XmlTransform
                 }
                 else
                 {
-                    XmlAttribute newAttribute = (XmlAttribute)transformAttribute.Clone();
+                    XmlAttribute newAttribute = (XmlAttribute)transformAttribute.CloneNode(true);
                     newAttribute.Value = newValue;
                     TargetNode.Attributes.Append(newAttribute);
                 }
@@ -373,7 +374,7 @@ namespace Octopus.Web.XmlTransform
                 }
             } while (position > -1);
 
-            System.Text.StringBuilder strbuilder = new StringBuilder(transformValue.Length);
+            StringBuilder strbuilder = new StringBuilder(transformValue.Length);
             if (matchsExpr.Count > 0)
             {
                 strbuilder.Remove(0, strbuilder.Length);
@@ -420,7 +421,7 @@ namespace Octopus.Web.XmlTransform
                 string pathToNode = GetXPathToNode(xmlAttribute.OwnerElement);
                 if (!string.IsNullOrEmpty(pathToNode))
                 {
-                    System.Text.StringBuilder identifier = new StringBuilder(256);
+                    StringBuilder identifier = new StringBuilder(256);
                     if (!(locators == null || locators.Count == 0))
                     {
                         foreach (string match in locators)
@@ -432,11 +433,11 @@ namespace Octopus.Web.XmlTransform
                                 {
                                     identifier.Append(" and ");
                                 }
-                                identifier.Append(String.Format(System.Globalization.CultureInfo.InvariantCulture, "@{0}='{1}'", match, val));
+                                identifier.Append(String.Format(CultureInfo.InvariantCulture, "@{0}='{1}'", match, val));
                             }
                             else
                             {
-                                throw new XmlTransformationException(string.Format(System.Globalization.CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_MatchAttributeDoesNotExist, match));
+                                throw new XmlTransformationException(string.Format(CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_MatchAttributeDoesNotExist, match));
                             }
                         }
                     }
@@ -448,7 +449,7 @@ namespace Octopus.Web.XmlTransform
                             if (TargetNodes[i] == xmlAttribute.OwnerElement)
                             {
                                 // Xpath is 1 based
-                                identifier.Append((i + 1).ToString(System.Globalization.CultureInfo.InvariantCulture));
+                                identifier.Append((i + 1).ToString(CultureInfo.InvariantCulture));
                                 break;
                             }
                         }
@@ -488,7 +489,7 @@ namespace Octopus.Web.XmlTransform
             if (fTokenizeParameter && parameters != null)
             {
                 int position = 0;
-                System.Text.StringBuilder strbuilder = new StringBuilder(transformValue.Length);
+                StringBuilder strbuilder = new StringBuilder(transformValue.Length);
                 position = 0;
                 List<RegularExpressions.Match> matchs = new List<RegularExpressions.Match>();
 
@@ -527,7 +528,7 @@ namespace Octopus.Web.XmlTransform
                             Dictionary<string, string> paramDictionary = new Dictionary<string, string>(4, StringComparer.OrdinalIgnoreCase);
 
                             paramDictionary[XPathWithIndex] = xpath;
-                            paramDictionary[TokenNumber] = index.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                            paramDictionary[TokenNumber] = index.ToString(CultureInfo.InvariantCulture);
 
                             // Get the key-value pare of the in the tranform form
                             for (int i = 0; i < attrnames.Count; i++)

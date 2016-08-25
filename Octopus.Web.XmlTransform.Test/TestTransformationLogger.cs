@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Text;
 using Octopus.Web.XmlTransform;
 
@@ -76,7 +77,7 @@ namespace Octopus.Web.XmlTransform.Test
         {
             // we will format like: transform.xml (30, 10) warning: Argument 'snap' did not match any attributes
             string format = "{0} ({1}, {2}) warning: {3}";
-            _log.AppendLine(string.Format(format, System.IO.Path.GetFileName(file), lineNumber, linePosition, string.Format(message,messageArgs)));
+            _log.AppendLine(string.Format(format, Path.GetFileName(file), lineNumber, linePosition, string.Format(message,messageArgs)));
         }
 
         public void LogError(string message, params object[] messageArgs)
@@ -93,7 +94,7 @@ namespace Octopus.Web.XmlTransform.Test
         {
             //transform.xml(33, 10) error: Could not resolve 'ThrowException' as a type of Transform
             string format = "{0} ({1}, {2}) error: {3}";
-            _log.AppendLine(string.Format(format, System.IO.Path.GetFileName(file), lineNumber, linePosition, string.Format(message,messageArgs)));
+            _log.AppendLine(string.Format(format, Path.GetFileName(file), lineNumber, linePosition, string.Format(message,messageArgs)));
         }
 
         public void LogErrorFromException(Exception ex) {}

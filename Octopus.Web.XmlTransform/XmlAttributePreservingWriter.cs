@@ -5,6 +5,7 @@ using System.Xml;
 using System.IO;
 using System.Diagnostics;
 using System.Globalization;
+using Octopus.System.Xml;
 
 namespace Octopus.Web.XmlTransform
 {
@@ -13,9 +14,7 @@ namespace Octopus.Web.XmlTransform
         private XmlTextWriter xmlWriter;
         private AttributeTextWriter textWriter;
 
-        public XmlAttributePreservingWriter(string fileName, Encoding encoding)
-            : this(encoding == null ? new StreamWriter(fileName) : new StreamWriter(fileName, false, encoding)) {
-        }
+
 
         public XmlAttributePreservingWriter(Stream w, Encoding encoding)
             : this(encoding == null ? new StreamWriter(w) : new StreamWriter(w, encoding))
@@ -281,16 +280,10 @@ namespace Octopus.Web.XmlTransform
                 baseWriter.Flush();
             }
 
-            public override void Close() {
-                baseWriter.Close();
-            }
         }
         #endregion
 
         #region XmlWriter implementation
-        public override void Close() {
-            xmlWriter.Close();
-        }
 
         public override void Flush() {
             xmlWriter.Flush();

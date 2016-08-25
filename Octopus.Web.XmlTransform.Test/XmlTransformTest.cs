@@ -1,32 +1,43 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Text;
 using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Diagnostics;
+using System.Reflection;
+using System.Resources;
+using NUnit;
+using NUnit.Framework;
 
 namespace Octopus.Web.XmlTransform.Test
 {
-    [TestClass]
+    [TestFixture]
     public class XmlTransformTest
     {
-        private TestContext testContextInstance;
-        public TestContext TestContext
+        private readonly ConcurrentBag<string> temporaryDirectories = new ConcurrentBag<string>();
+
+        [OneTimeTearDown]
+        public void AfterAllTestsHaveRun()
         {
-            get
+            foreach (var folder in temporaryDirectories)
             {
-                return testContextInstance;
-            }
-            set
-            {
-                testContextInstance = value;
+                try
+                {
+                    Directory.Delete(folder, true);
+                }
+                catch (Exception ex)
+                {
+                    //not a lot we can do
+                    Console.WriteLine($"Failed to delete temporary directory '{folder}' after tests completed: {ex}");
+                }
             }
         }
 
-        [TestMethod]
+        [Test]
         public void XmlTransform_Support_WriteToStream()
         {
-            string src = CreateATestFile("Web.config", Properties.Resources.Web);
-            string transformFile = CreateATestFile("Web.Release.config", Properties.Resources.Web_Release);
+            string src = CreateATestFile("Web.config", "Web.config");
+            string transformFile = CreateATestFile("Web.Release.config", "Web.Release.config");
             string destFile = GetTestFilePath("MyWeb.config");
 
             //execute
@@ -48,7 +59,7 @@ namespace Octopus.Web.XmlTransform.Test
             Assert.AreEqual(true, fsDestFile.CanWrite, "The file stream can not be written. was it closed?");
 
             //sanity verify the content is right, (xml was transformed)
-            fsDestFile.Close();
+            fsDestFile.Dispose();
             string content = File.ReadAllText(destFile);
             Assert.IsFalse(content.Contains("debug=\"true\""));
             
@@ -61,42 +72,42 @@ namespace Octopus.Web.XmlTransform.Test
             x.Dispose();
         }
 
-        [TestMethod]
+        [Test]
         public void XmlTransform_AttibuteFormatting()
         {
-            Transform_TestRunner_ExpectSuccess(Properties.Resources.AttributeFormating_source,
-                    Properties.Resources.AttributeFormating_transform,
-                    Properties.Resources.AttributeFormating_destination,
-                    Properties.Resources.AttributeFormatting_log);
+            Transform_TestRunner_ExpectSuccess("AttributeFormatting_source.xml",
+                    "AttributeFormatting_transform.xml",
+                    "AttributeFormatting_destination.bsl",
+                    "AttributeFormatting.Log");
         }
 
-        [TestMethod]
+        [Test]
         public void XmlTransform_TagFormatting()
         {
-             Transform_TestRunner_ExpectSuccess(Properties.Resources.TagFormatting_source,
-                    Properties.Resources.TagFormatting_transform,
-                    Properties.Resources.TagFormatting_destination,
-                    Properties.Resources.TagFormatting_log);
+            Transform_TestRunner_ExpectSuccess("TagFormatting_source.xml",
+                   "TagFormatting_transform.xml",
+                   "TagFormatting_destination.bsl",
+                   "TagFormatting.log");
         }
 
-        [TestMethod]
+        [Test]
         public void XmlTransform_HandleEdgeCase()
         {
             //2 edge cases we didn't handle well and then fixed it per customer feedback.
             //    a. '>' in the attribute value
             //    b. element with only one character such as <p>
-            Transform_TestRunner_ExpectSuccess(Properties.Resources.EdgeCase_source,
-                    Properties.Resources.EdgeCase_transform,
-                    Properties.Resources.EdgeCase_destination,
-                    Properties.Resources.EdgeCase_log);
+            Transform_TestRunner_ExpectSuccess("EdgeCase_source.xml",
+                    "EdgeCase_transform.xml",
+                    "EdgeCase_destination.bsl",
+                    "EdgeCase.log");
         }
 
-        [TestMethod]
+        [Test]
         public void XmlTransform_ErrorAndWarning()
         {
-            Transform_TestRunner_ExpectFail(Properties.Resources.WarningsAndErrors_source,
-                    Properties.Resources.WarningsAndErrors_transform,
-                    Properties.Resources.WarningsAndErrors_log);
+            Transform_TestRunner_ExpectFail("WarningsAndErrors_source.xml",
+                    "WarningsAndErrors_transform.xml",
+                    "WarningsAndErrors.log");
         }
 
         private void Transform_TestRunner_ExpectSuccess(string source, string transform, string baseline, string expectedLog)
@@ -120,8 +131,8 @@ namespace Octopus.Web.XmlTransform.Test
             x.Dispose();
             //test
             Assert.AreEqual(true, succeed);
-            CompareFiles(destFile, baselineFile);
-            CompareMultiLines(expectedLog, logger.LogText);
+            CompareFiles(baselineFile, destFile);
+            CompareMultiLines(ReadResource(expectedLog), logger.LogText);
         }
 
         private void Transform_TestRunner_ExpectFail(string source, string transform, string expectedLog)
@@ -144,21 +155,27 @@ namespace Octopus.Web.XmlTransform.Test
             x.Dispose();
             //test
             Assert.AreEqual(false, succeed);
-            CompareMultiLines(expectedLog, logger.LogText);
+            CompareMultiLines(ReadResource(expectedLog), logger.LogText);
         }
 
         private void CompareFiles(string baseLinePath, string resultPath)
         {
             string bsl;
-            using (StreamReader sr = new StreamReader(baseLinePath))
+            using (var stream = File.OpenRead(baseLinePath))
             {
-                bsl = sr.ReadToEnd();
+                using (StreamReader sr = new StreamReader(stream))
+                {
+                    bsl = sr.ReadToEnd();
+                }
             }
 
             string result;
-            using (StreamReader sr = new StreamReader(resultPath))
+            using (var stream = File.OpenRead(resultPath))
             {
-                result = sr.ReadToEnd();
+                using (StreamReader sr = new StreamReader(stream))
+                {
+                    result = sr.ReadToEnd();
+                }
             }
 
             CompareMultiLines(bsl, result);
@@ -166,8 +183,8 @@ namespace Octopus.Web.XmlTransform.Test
 
         private void CompareMultiLines(string baseline, string result)
         {
-            string[] baseLines = baseline.Split(new string[] { System.Environment.NewLine },  StringSplitOptions.None);
-            string[] resultLines = result.Split(new string[] { System.Environment.NewLine },  StringSplitOptions.None);
+            string[] baseLines = baseline.Split(new string[] { global::System.Environment.NewLine },  StringSplitOptions.None);
+            string[] resultLines = result.Split(new string[] { global::System.Environment.NewLine },  StringSplitOptions.None);
 
             for (int i = 0; i < baseLines.Length; i++)
             {
@@ -175,19 +192,42 @@ namespace Octopus.Web.XmlTransform.Test
             }
         }
 
-        private string CreateATestFile(string filename, string contents)
+        private string ReadResource(string filename)
         {
-            string file = GetTestFilePath(filename);
+            Assembly assembly = typeof(XmlTransformTest).GetTypeInfo().Assembly;
+            string resourceName = $"{assembly.GetName().Name}.Resources.{filename}";
+            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+            {
+                if (stream == null)
+                {
+                    throw new MissingManifestResourceException("failed to load " + resourceName);
+                }
+
+                using (StreamReader streamReader = new StreamReader(stream))
+                {
+                    return streamReader.ReadToEnd();
+                }
+            }
+        }
+
+        private string CreateATestFile(string filename, string resourceName)
+        {
+            var contents = ReadResource(resourceName);
+            var file = GetTestFilePath(filename);
             File.WriteAllText(file, contents);
             return file;
         }
 
         private string GetTestFilePath(string filename)
         {
-            string folder = Path.Combine(TestContext.TestDeploymentDir, TestContext.TestName);
-            Directory.CreateDirectory(folder);
-            string file = Path.Combine(folder, filename);
-            return file;
+            var folder = Path.GetTempPath();
+            var guid = Guid.NewGuid().ToString();
+            var testRunFolder = Path.Combine(folder, guid);
+
+            Directory.CreateDirectory(testRunFolder);
+            temporaryDirectories.Add(testRunFolder);
+
+            return Path.Combine(testRunFolder, filename);
         }
     }
 }

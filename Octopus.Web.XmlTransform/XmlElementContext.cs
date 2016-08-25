@@ -204,7 +204,7 @@ namespace Octopus.Web.XmlTransform
                 clonedNode = infoDocument.CloneNodeFromOtherDocument(sourceNode);
             }
             else {
-                XmlReader reader = new XmlTextReader(new StringReader(sourceNode.OuterXml));
+                XmlReader reader = XmlReader.Create(new StringReader(sourceNode.OuterXml));
                 clonedNode = TargetDocument.ReadNode(reader);
             }
 
@@ -302,7 +302,7 @@ namespace Octopus.Web.XmlTransform
         private string ParseNameAndArguments(string name, out string arguments) {
             arguments = null;
 
-            System.Text.RegularExpressions.Match match = NameAndArgumentsRegex.Match(name);
+            global::System.Text.RegularExpressions.Match match = NameAndArgumentsRegex.Match(name);
             if (match.Success) {
                 if (match.Groups["arguments"].Success) {
                     CaptureCollection argumentCaptures = match.Groups["arguments"].Captures;

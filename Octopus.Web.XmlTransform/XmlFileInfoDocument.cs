@@ -4,6 +4,7 @@ using System.Text;
 using System.Xml;
 using System.IO;
 using System.Diagnostics;
+using Octopus.System.Xml;
 
 namespace Octopus.Web.XmlTransform
 {
@@ -18,7 +19,7 @@ namespace Octopus.Web.XmlTransform
         private int _lineNumberOffset = 0;
         private int _linePositionOffset = 0;
 
-        public override void Load(string filename) {
+        public void Load(string filename) {
             LoadFromFileName(filename);
 
             _firstLoad = false;
@@ -32,9 +33,6 @@ namespace Octopus.Web.XmlTransform
 
             base.Load(reader);
 
-            if (_reader != null) {
-                _textEncoding = _reader.Encoding;
-            }
 
             _firstLoad = false;
         }
@@ -48,7 +46,11 @@ namespace Octopus.Web.XmlTransform
                     _preservationProvider = new XmlAttributePreservationProvider(filename);
                 }
 
-                reader = new StreamReader(filename, true);
+                const int defaultFileStreamBufferSize = 1024;
+                var stream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read,
+                    defaultFileStreamBufferSize, FileOptions.SequentialScan);
+
+                reader = new StreamReader(stream, Encoding.UTF8, true);
                 LoadFromTextReader(reader);
             }
             finally {
@@ -58,7 +60,7 @@ namespace Octopus.Web.XmlTransform
                     _preservationProvider = null;
                 }
                 if (reader != null) {
-                    reader.Close();
+                    reader.Dispose();
                 }
             }
         }
@@ -74,13 +76,9 @@ namespace Octopus.Web.XmlTransform
                 _textEncoding = GetEncodingFromStream(streamReader.BaseStream);
             }
 
-            _reader = new XmlTextReader(_fileName, textReader);
+            _reader = new XmlTextReader(_fileName, textReader, normalizeLineEndings: false);
 
             base.Load(_reader);
-
-            if (_textEncoding == null) {
-                _textEncoding = _reader.Encoding;
-            }
         }
 
         private Encoding GetEncodingFromStream(Stream stream) {
@@ -113,7 +111,7 @@ namespace Octopus.Web.XmlTransform
             try {
                 IXmlLineInfo lineInfo = element as IXmlLineInfo;
                 if (lineInfo != null) {
-                    _reader = new XmlTextReader(new StringReader(element.OuterXml));
+                    _reader = new XmlTextReader(new StringReader(element.OuterXml), normalizeLineEndings: false);
 
                     _lineNumberOffset = lineInfo.LineNumber - 1;
                     _linePositionOffset = lineInfo.LinePosition - 2;
@@ -125,7 +123,7 @@ namespace Octopus.Web.XmlTransform
                     _fileName = null;
                     _reader = null;
 
-                    clone = ReadNode(new XmlTextReader(new StringReader(element.OuterXml)));
+                    clone = ReadNode(new XmlTextReader(new StringReader(element.OuterXml), normalizeLineEndings: false));
                 }
             }
             finally {
@@ -187,7 +185,7 @@ namespace Octopus.Web.XmlTransform
                         if (declaration != null) {
                             string value = declaration.Encoding;
                             if (value.Length > 0) {
-                                return System.Text.Encoding.GetEncoding(value);
+                                return global::System.Text.Encoding.GetEncoding(value);
                             }
                         }
                     }
@@ -196,16 +194,19 @@ namespace Octopus.Web.XmlTransform
             }
         }
 
-        public override void Save(string filename)
+        public void Save(string filename) 
         {
             XmlWriter xmlWriter = null;
+            FileStream stream = null;
             try{
                 if (PreserveWhitespace){
                     XmlFormatter.Format(this);
-                    xmlWriter = new XmlAttributePreservingWriter(filename, TextEncoding);
+                    stream = File.OpenWrite(filename);
+                    xmlWriter = new XmlAttributePreservingWriter(stream, TextEncoding);
                 }
                 else {
-                    XmlTextWriter textWriter = new XmlTextWriter(filename, TextEncoding);
+                    stream = File.OpenWrite(filename);
+                    XmlTextWriter textWriter = new XmlTextWriter(stream, TextEncoding);
                     textWriter.Formatting = Formatting.Indented;
                     xmlWriter = textWriter;
                 }
@@ -214,7 +215,38 @@ namespace Octopus.Web.XmlTransform
             finally {
                 if (xmlWriter != null) {
                     xmlWriter.Flush();
-                    xmlWriter.Close();
+                    xmlWriter.Dispose();
+                }
+                if (stream != null) {
+                    stream.Dispose();
+                }
+            }
+        }
+
+        public override void Save(TextWriter writer)
+        {
+            XmlWriter xmlWriter = null;
+            try
+            {
+                if (PreserveWhitespace)
+                {
+                    XmlFormatter.Format(this);
+                    xmlWriter = new XmlAttributePreservingWriter(writer);
+                }
+                else
+                {
+                    xmlWriter = XmlWriter.Create(writer);
+                    xmlWriter.Settings.Encoding = TextEncoding;
+                    xmlWriter.Settings.Indent = true;
+                }
+                WriteTo(xmlWriter);
+            }
+            finally
+            {
+                if (xmlWriter != null)
+                {
+                    xmlWriter.Flush();
+                    xmlWriter.Dispose();
                 }
             }
         }
@@ -415,7 +447,7 @@ namespace Octopus.Web.XmlTransform
         {
             if (_reader != null)
             {
-                _reader.Close();
+                _reader.Dispose();
                 _reader = null;
             }
 
