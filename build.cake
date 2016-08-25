@@ -143,17 +143,17 @@ Task("__Publish")
             ApiKey = EnvironmentVariable("MyGetApiKey")
         });
     }
-    if (shouldPushToNuGet)
-    {
-        NuGetPush("artifacts/Octopus.Web.XmlTransform." + nugetVersion + ".nupkg", new NuGetPushSettings {
-            Source = "https://www.nuget.org/api/v2/package",
-            ApiKey = EnvironmentVariable("NuGetApiKey")
-        });
-        NuGetPush("artifacts/Octopus.Web.XmlTransform." + nugetVersion + ".symbols.nupkg", new NuGetPushSettings {
-            Source = "https://www.nuget.org/api/v2/package",
-            ApiKey = EnvironmentVariable("NuGetApiKey")
-        });
-    }
+//    if (shouldPushToNuGet)
+//    {
+//        NuGetPush("artifacts/Octopus.Web.XmlTransform." + nugetVersion + ".nupkg", new NuGetPushSettings {
+//            Source = "https://www.nuget.org/api/v2/package",
+//            ApiKey = EnvironmentVariable("NuGetApiKey")
+//        });
+//        NuGetPush("artifacts/Octopus.Web.XmlTransform." + nugetVersion + ".symbols.nupkg", new NuGetPushSettings {
+//            Source = "https://www.nuget.org/api/v2/package",
+//            ApiKey = EnvironmentVariable("NuGetApiKey")
+//        });
+//    }
 });
 
 //////////////////////////////////////////////////////////////////////
