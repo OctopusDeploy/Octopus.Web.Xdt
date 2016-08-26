@@ -15,7 +15,7 @@ var configuration = Argument("configuration", "Release");
 ///////////////////////////////////////////////////////////////////////////////
 var artifactsDir = "./artifacts";
 var globalAssemblyFile = "./Octopus.Web.XmlTransform/Properties/AssemblyInfo.cs";
-var projectToPackage = "./Octopus.Web.XmlTransform";
+var projectsToPackage = new []{"./Octopus.Web.XmlTransform","./Octopus.System.Xml.ReaderWriter"};
 
 var isContinuousIntegrationBuild = !BuildSystem.IsLocalBuild;
 
@@ -104,23 +104,29 @@ Task("__UpdateProjectJsonVersion")
     .WithCriteria(isContinuousIntegrationBuild)
     .Does(() =>
 {
-    var projectToPackagePackageJson = $"{projectToPackage}/project.json";
-    Information("Updating {0} version -> {1}", projectToPackagePackageJson, nugetVersion);
+    foreach(var projectToPackage in projectsToPackage)
+    {
+        var projectToPackagePackageJson = $"{projectToPackage}/project.json";
+        Information("Updating {0} version -> {1}", projectToPackagePackageJson, nugetVersion);
 
-    TransformConfig(projectToPackagePackageJson, projectToPackagePackageJson, new TransformationCollection {
-        { "version", nugetVersion }
-    });
+        TransformConfig(projectToPackagePackageJson, projectToPackagePackageJson, new TransformationCollection {
+            { "version", nugetVersion }
+        });
+    };
 });
 
 Task("__Pack")
     .Does(() =>
 {
-    DotNetCorePack(projectToPackage, new DotNetCorePackSettings
+    foreach(var projectToPackage in projectsToPackage)
     {
-        Configuration = configuration,
-        OutputDirectory = artifactsDir,
-        NoBuild = true
-    });
+        DotNetCorePack(projectToPackage, new DotNetCorePackSettings
+        {
+            Configuration = configuration,
+            OutputDirectory = artifactsDir,
+            NoBuild = true
+        });
+    };
 });
 
 Task("__Publish")
@@ -139,6 +145,14 @@ Task("__Publish")
             ApiKey = EnvironmentVariable("MyGetApiKey")
         });
         NuGetPush("artifacts/Octopus.Web.XmlTransform." + nugetVersion + ".symbols.nupkg", new NuGetPushSettings {
+            Source = "https://octopus.myget.org/F/octopus-dependencies/api/v3/index.json",
+            ApiKey = EnvironmentVariable("MyGetApiKey")
+        });
+        NuGetPush("artifacts/Octopus.System.Xml.ReaderWriter." + nugetVersion + ".nupkg", new NuGetPushSettings {
+            Source = "https://octopus.myget.org/F/octopus-dependencies/api/v3/index.json",
+            ApiKey = EnvironmentVariable("MyGetApiKey")
+        });
+        NuGetPush("artifacts/Octopus.System.Xml.ReaderWriter." + nugetVersion + ".symbols.nupkg", new NuGetPushSettings {
             Source = "https://octopus.myget.org/F/octopus-dependencies/api/v3/index.json",
             ApiKey = EnvironmentVariable("MyGetApiKey")
         });
