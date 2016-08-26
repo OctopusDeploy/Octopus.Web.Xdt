@@ -6,12 +6,8 @@
   },
 
   "frameworks": {
-    "netcoreapp1.0": {
+    "netstandard1.5": {
       "dependencies": {
-        "Microsoft.NETCore.App": {
-          "type": "platform",
-          "version": "1.0.0"
-        },
         "Microsoft.Extensions.CommandLineUtils": "1.0.0",
         "System.Runtime.Loader": "4.0.0",
         "System.Xml.XmlDocument": "4.0.1",
