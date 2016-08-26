@@ -50,7 +50,7 @@ namespace Octopus.Web.XmlTransform
                     throw new XmlTransformationException(string.Format(CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_IncorrectBaseType, type.FullName, typeof(ObjectType).Name));
                 }
                 else {
-                    ConstructorInfo constructor = type.GetConstructor(Type.EmptyTypes);
+                    ConstructorInfo constructor = type.GetTypeInfo().GetConstructor(Type.EmptyTypes);
                     if (constructor == null) {
                         throw new XmlTransformationException(string.Format(CultureInfo.CurrentCulture,SR.XMLTRANSFORMATION_NoValidConstructor, type.FullName));
                     }
