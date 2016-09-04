@@ -1,10 +1,7 @@
 {
   "version": "0.0.0-*",
   "dependencies": {
-    "Octopus.System.Xml.ReaderWriter": {
-      "version": "*",
-      "type": "build"
-    }
+    "Octopus.System.Xml.ReaderWriter": "*"
   },
   "frameworks": {
     "netstandard1.5": {
