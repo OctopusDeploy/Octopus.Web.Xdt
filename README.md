@@ -15,3 +15,9 @@ There are hopes that the upstream `Microsoft.Web.Xdt` package will be converted,
 * File encoding support was removed in the port - behaviour is undefined at this point
 * Tests were converted to NUnit, as MSTest is not supported
 * Test code was modified to read test case files in a different way as file based resources work differently under .NET Core
+
+## License
+
+`Octopus.Web.XmlTransform` and `Octopus.Web.XmlTransform.Test` are licensed under the Apache 2.0 license (as per the [original Microsoft.Web.Xdt license](https://xdt.codeplex.com/license)).
+
+`Octopus.System.Xml.ReaderWriter` is licensed under the MIT licence (as per the [original corefx licence](https://github.com/dotnet/corefx/blob/master/LICENSE))
