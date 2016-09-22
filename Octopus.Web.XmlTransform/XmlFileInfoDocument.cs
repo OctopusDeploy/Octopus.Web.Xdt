@@ -201,11 +201,11 @@ namespace Octopus.Web.XmlTransform
             try{
                 if (PreserveWhitespace){
                     XmlFormatter.Format(this);
-                    stream = File.OpenWrite(filename);
+                    stream = File.Create(filename);
                     xmlWriter = new XmlAttributePreservingWriter(stream, TextEncoding);
                 }
                 else {
-                    stream = File.OpenWrite(filename);
+                    stream = File.Create(filename);
                     XmlTextWriter textWriter = new XmlTextWriter(stream, TextEncoding);
                     textWriter.Formatting = Formatting.Indented;
                     xmlWriter = textWriter;
