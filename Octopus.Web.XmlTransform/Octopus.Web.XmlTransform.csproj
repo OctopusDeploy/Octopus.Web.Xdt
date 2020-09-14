@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <PackageProjectUrl>https://github.com/OctopusDeploy/Sashimi.AzureServiceFabric</PackageProjectUrl>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Octopus.System.Xml.ReaderWriter\Octopus.System.Xml.ReaderWriter.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
+  </ItemGroup>
+</Project>

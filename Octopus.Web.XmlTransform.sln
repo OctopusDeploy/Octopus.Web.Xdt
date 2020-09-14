@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Octopus.Web.XmlTransform.Test", "Octopus.Web.XmlTransform.Test\Octopus.Web.XmlTransform.Test.xproj", "{22AC988D-26C0-43A9-8EB1-102DA31F0F8F}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Octopus.Web.XmlTransform.Test", "Octopus.Web.XmlTransform.Test\Octopus.Web.XmlTransform.Test.csproj", "{22AC988D-26C0-43A9-8EB1-102DA31F0F8F}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Octopus.Web.XmlTransform", "Octopus.Web.XmlTransform\Octopus.Web.XmlTransform.xproj", "{0684EE2A-6F30-4BC7-B5E7-8CBA15534E06}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Octopus.Web.XmlTransform", "Octopus.Web.XmlTransform\Octopus.Web.XmlTransform.csproj", "{0684EE2A-6F30-4BC7-B5E7-8CBA15534E06}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Octopus.System.Xml.ReaderWriter", "Octopus.System.Xml.ReaderWriter\Octopus.System.Xml.ReaderWriter.xproj", "{5B1F1064-DCA9-435A-BCD3-06540C4CAD8B}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Octopus.System.Xml.ReaderWriter", "Octopus.System.Xml.ReaderWriter\Octopus.System.Xml.ReaderWriter.csproj", "{5B1F1064-DCA9-435A-BCD3-06540C4CAD8B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{CD051BBF-C1BB-4742-84F3-647DCA9A508F}"
 	ProjectSection(SolutionItems) = preProject

@@ -5,6 +5,7 @@ using System.Xml;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.IO;
+using System.Xml.Schema;
 
 namespace Octopus.Web.XmlTransform
 {
@@ -33,8 +34,8 @@ namespace Octopus.Web.XmlTransform
             Debug.Assert(elementStartTag.StartsWith("<", StringComparison.Ordinal) && elementStartTag.EndsWith(">", StringComparison.Ordinal), "Expected string containing exactly a single tag");
             WhitespaceTrackingTextReader whitespaceReader = new WhitespaceTrackingTextReader(new StringReader(elementStartTag));
 
-            int lastCharacter = EnumerateAttributes(elementStartTag, 
-                (int line, int linePosition, string attributeName) => 
+            int lastCharacter = EnumerateAttributes(elementStartTag,
+                (int line, int linePosition, string attributeName) =>
                 {
                     orderedAttributes.Add(attributeName);
                     if (whitespaceReader.ReadToPosition(line, linePosition))
@@ -65,7 +66,12 @@ namespace Octopus.Web.XmlTransform
                 xmlDocString = elementStartTag.Substring(0, elementStartTag.Length-1) + "/>" ;
             }
 
-            XmlReader xmlReader = XmlReader.Create(new StringReader(xmlDocString));
+            var xmlReaderSettings = new XmlReaderSettings()
+            {
+                ValidationFlags =  XmlSchemaValidationFlags.None,
+                ValidationType = ValidationType.None
+            };
+            XmlReader xmlReader = XmlReader.Create(new StringReader(xmlDocString), xmlReaderSettings);
             xmlReader.Read();
 
             bool hasMoreAttributes = xmlReader.MoveToFirstAttribute();
@@ -154,7 +160,7 @@ namespace Octopus.Web.XmlTransform
                         //      keep the last one.
                         //   3. Otherwise, remove leading space.
                         //
-                        // In order to remove trailing space, we have to 
+                        // In order to remove trailing space, we have to
                         // remove the leading space of the next attribute, so
                         // we store this leading space to replace the next.
                         if (leadingSpaces.ContainsKey(key)) {

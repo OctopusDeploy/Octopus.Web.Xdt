@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TargetFrameworks>net462;netcoreapp3.1</TargetFrameworks>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Octopus.Web.XmlTransform\Octopus.Web.XmlTransform.csproj" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.0" />
+    <PackageReference Include="nunit" Version="3.12.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
+    <PackageReference Include="TeamCity.VSTest.TestAdapter" Version="1.0.22" />
+  </ItemGroup>
+</Project>

@@ -19,7 +19,7 @@ namespace Octopus.Web.XmlTransform
         private int _lineNumberOffset = 0;
         private int _linePositionOffset = 0;
 
-        public void Load(string filename) {
+        public override void Load(string filename) {
             LoadFromFileName(filename);
 
             _firstLoad = false;
@@ -76,7 +76,7 @@ namespace Octopus.Web.XmlTransform
                 _textEncoding = GetEncodingFromStream(streamReader.BaseStream);
             }
 
-            _reader = new XmlTextReader(_fileName, textReader, normalizeLineEndings: false);
+            _reader = new XmlTextReader(textReader);
 
             base.Load(_reader);
         }
@@ -111,7 +111,7 @@ namespace Octopus.Web.XmlTransform
             try {
                 IXmlLineInfo lineInfo = element as IXmlLineInfo;
                 if (lineInfo != null) {
-                    _reader = new XmlTextReader(new StringReader(element.OuterXml), normalizeLineEndings: false);
+                    _reader = new XmlTextReader(new StringReader(element.OuterXml));
 
                     _lineNumberOffset = lineInfo.LineNumber - 1;
                     _linePositionOffset = lineInfo.LinePosition - 2;
@@ -123,7 +123,7 @@ namespace Octopus.Web.XmlTransform
                     _fileName = null;
                     _reader = null;
 
-                    clone = ReadNode(new XmlTextReader(new StringReader(element.OuterXml), normalizeLineEndings: false));
+                    clone = ReadNode(new XmlTextReader(new StringReader(element.OuterXml)));
                 }
             }
             finally {
@@ -194,7 +194,7 @@ namespace Octopus.Web.XmlTransform
             }
         }
 
-        public void Save(string filename) 
+        public override void Save(string filename)
         {
             XmlWriter xmlWriter = null;
             FileStream stream = null;
@@ -461,7 +461,7 @@ namespace Octopus.Web.XmlTransform
         public void Dispose()
         {
             Dispose(true);
-            GC.SuppressFinalize(this);        
+            GC.SuppressFinalize(this);
         }
 
         ~XmlFileInfoDocument()
