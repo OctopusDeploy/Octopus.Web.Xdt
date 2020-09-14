@@ -66,12 +66,7 @@ namespace Octopus.Web.XmlTransform
                 xmlDocString = elementStartTag.Substring(0, elementStartTag.Length-1) + "/>" ;
             }
 
-            var xmlReaderSettings = new XmlReaderSettings()
-            {
-                ValidationFlags =  XmlSchemaValidationFlags.None,
-                ValidationType = ValidationType.None
-            };
-            XmlReader xmlReader = XmlReader.Create(new StringReader(xmlDocString), xmlReaderSettings);
+            XmlReader xmlReader = XmlReader.Create(new StringReader(xmlDocString));
             xmlReader.Read();
 
             bool hasMoreAttributes = xmlReader.MoveToFirstAttribute();
